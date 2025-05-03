@@ -6,9 +6,10 @@ function Cart() {
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    console.log('Cart items from localStorage:', storedCart);  // Check cart data
     setCartItems(storedCart);
   }, []);
-
+  
   const removeItem = (index) => {
     const newCart = [...cartItems];
     newCart.splice(index, 1);
