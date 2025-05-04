@@ -1,3 +1,4 @@
+// client/src/pages/Checkout.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -20,32 +21,30 @@ function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const orderData = {
       customer_name: name,
       shipping_address: address,
-      phone_number: phone, // Ensure you have a phone state variable and input
+      phone_number: phone,
       items: cartItems,
       total,
     };
-  
-    if (paymentMethod === 'upi') {
-      navigate('/scanner', { state: orderData });
+
+    if (paymentMethod === 'UPI') {
+      localStorage.setItem('pendingOrder', JSON.stringify(orderData));
+      navigate('/scanner');
     } else {
-      // For COD, save immediately
       try {
-        const response = await axios.post('http://localhost:5000/api/orders', orderData);
-        console.log('Order saved:', response.data); // Log the response
+        await axios.post('http://localhost:5000/api/orders', orderData);
         localStorage.removeItem('cart');
         alert('Order placed with Cash on Delivery!');
         navigate('/');
       } catch (error) {
-        console.error('Checkout error:', error.response ? error.response.data : error); // Log more detailed error
+        console.error('Checkout error:', error);
         alert('Error placing order.');
       }
     }
   };
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-8">

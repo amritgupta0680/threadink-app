@@ -1,36 +1,49 @@
+// client/src/pages/Scanner.jsx
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Scanner() {
+  const upiId = "store@upi";
   const navigate = useNavigate();
-  const location = useLocation();
-  const orderDetails = location.state;
 
   const handlePaymentDone = async () => {
+    const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+
+    if (!pendingOrder) {
+      alert("No order data found.");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/orders', orderDetails);
+      await axios.post('http://localhost:5000/api/orders', pendingOrder);
+      localStorage.removeItem('pendingOrder');
       localStorage.removeItem('cart');
-      alert('Order placed successfully!');
+      alert('Payment successful! Order placed.');
       navigate('/');
-    } catch (error) {
-      console.error('Error saving order:', error);
+    } catch (err) {
+      console.error('Error saving order:', err);
       alert('Failed to save order.');
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
-      <h2 className="text-2xl font-bold text-pink-500 mb-6">Scan & Pay</h2>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+      <h1 className="text-3xl font-bold text-blue-700 mb-4">Scan & Pay</h1>
+
       <img
         src="/images/qr-placeholder.png"
-        alt="QR Code"
-        className="w-72 h-72 object-contain mb-6 border border-gray-300 p-2 rounded"
+        alt="UPI Scanner"
+        className="w-64 h-64 mb-4 object-contain border border-gray-300 p-2"
       />
-      <p className="mb-4 text-blue-700 font-semibold">Pay to: clothesprint@upi</p>
+
+      <p className="text-lg text-gray-800 mb-6">
+        Pay to UPI ID: <span className="font-semibold">{upiId}</span>
+      </p>
+
       <button
         onClick={handlePaymentDone}
-        className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
+        className="bg-orange-500 text-blue-500 px-6 py-3 rounded hover:bg-orange-600 transition duration-200"
       >
         Payment Done
       </button>
